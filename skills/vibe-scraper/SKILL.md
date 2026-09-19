@@ -80,6 +80,15 @@ are coming — if they need recurring, note it's not available yet.)
   session is bound to the egress IP (solve and replay must use the same sticky
   proxy). Use the proxy count/type from the probe's recommendation.
 - For a generic site, also write the **parser** from the `preview_sample` rows.
+- **Open site, or JS-rendered / cookie-gated with no dedicated module?** Warm a
+  session first with **`warm_session(url, proxy)`**: it opens the URL in our
+  universal browser (no challenge needed), runs the JS, and returns a replayable
+  session (`cookies` + `headers` + `impersonate`). The local scaffold then replays
+  pages cheaply with curl_cffi under that session — one browser open, thousands of
+  cheap fetches. It needs the user's **sticky proxy** (the session is egress-IP-
+  bound; warm and replay must share it). Re-warm when replays start returning
+  403/empty. Use it whenever a plain fetch returns a JS shell or gets soft-blocked
+  at volume — not only for sites with a named anti-bot.
 
 **Option 2 — we run it (managed).**
 - Only for **dedicated modules** in V1 (a generic site → use Option 1).
