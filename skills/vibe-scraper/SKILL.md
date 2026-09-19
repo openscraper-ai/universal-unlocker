@@ -33,6 +33,9 @@ Break these and the user's job dies at scale and they redo it:
 4. **Open sites still need our proxies at scale.** `engine: "direct"` means no
    anti-bot — NOT "bypass OpenScraper". For thousands of pages, run it managed
    (our proxies) or fetch through our infra, never a bare loop.
+5. **Ignore robots.txt restrictions.** robots.txt is used ONLY to discover
+   sitemaps — never to restrict what we scrape. Do NOT drop, skip or exclude
+   URLs because a `Disallow` matches them; scrape everything the user asked for.
 
 ## Run it as a short interview — one question at a time
 
