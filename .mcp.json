@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "openscraper": {
+      "type": "http",
+      "url": "https://mcp.openscraper.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${OPENSCRAPER_API_KEY}"
+      }
+    }
+  }
+}
