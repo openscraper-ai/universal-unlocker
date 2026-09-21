@@ -47,8 +47,11 @@ Ask for the target URL. Then call **`probe_site(url)`** and report, plainly:
 - reachable? which **protection** (e.g. DataDome) — or "open, no protection";
 - which **engine** will get through (`direct` / `solver` / `unlocker`);
 - the **volume** estimate;
-- the **proxy recommendation** (type + count) — matters for the "run it yourself"
-  option below.
+- the **estimated time** for the full job (`time_estimate`) — report it as the
+  range it is (it's a rough figure);
+- the **proxy recommendation** — always a **POOL** (`proxy_recommendation.count`
+  rotating IPs), never a single IP: one IP at volume gets flagged and a single ban
+  stops the whole job. Matters for the "run it yourself" option below.
 
 Then call **`list_modules()`** and check whether the site maps to a **dedicated
 module** (e.g. leboncoin → `leboncoin_matrix`, google maps → `googlemaps_matrix`).
@@ -70,25 +73,39 @@ are coming — if they need recurring, note it's not available yet.)
 
 ## Then offer the two options — and let them choose
 
+**First give a one-block recap so the choice is informed.** Every option you list
+must carry BOTH its **estimated cost** (`estimate_cost`) and its **estimated time**
+(`time_estimate` from the probe, as a range) — never a price without a time. Also
+state the **volume** and, for any local run, the **proxy pool** required
+(`proxy_recommendation.count` rotating IPs — never "one proxy is enough"). Example
+shape:
+> ~7,200 pages. A) Managed via OpenScraper ≈ 6.85€, ≈ 35–60 min. B) warm_session +
+> local curl_cffi replay ≈ ~free on our side, ≈ 15–40 min, needs a pool of ~20
+> rotating sticky proxies. C) Listing only now ≈ 0.70€, ≈ 5 min.
+
 **Option 1 — run it yourself (local code).**
 - Call **`generate_client_code(module, params, lang)`** (python/javascript/curl)
   and give them the code. The key is a `YOUR_API_KEY` placeholder — tell them to
   paste their own.
 - If `probe_site` said the engine is **solver** and the site is **not** a
   dedicated module, the code will fetch through OUR infra but replay/paginate on
-  THEIR machine → **ask for their proxy** and wire it in, because the anti-bot
+  THEIR machine → **ask for their proxy POOL** and wire it in, because the anti-bot
   session is bound to the egress IP (solve and replay must use the same sticky
-  proxy). Use the proxy count/type from the probe's recommendation.
+  proxy per session). Recommend the **pool size** from the probe
+  (`proxy_recommendation.count`, rotating) — never a single IP: it gets flagged at
+  volume and one ban stops the run. Keep a few spares to swap out banned IPs.
 - For a generic site, also write the **parser** from the `preview_sample` rows.
 - **Open site, or JS-rendered / cookie-gated with no dedicated module?** Warm a
   session first with **`warm_session(url, proxy)`**: it opens the URL in our
   universal browser (no challenge needed), runs the JS, and returns a replayable
   session (`cookies` + `headers` + `impersonate`). The local scaffold then replays
   pages cheaply with curl_cffi under that session — one browser open, thousands of
-  cheap fetches. It needs the user's **sticky proxy** (the session is egress-IP-
-  bound; warm and replay must share it). Re-warm when replays start returning
-  403/empty. Use it whenever a plain fetch returns a JS shell or gets soft-blocked
-  at volume — not only for sites with a named anti-bot.
+  cheap fetches. It needs a **pool of sticky proxies** (`proxy_recommendation.count`),
+  not one: each warmed session is bound to one egress IP, so warm several sessions
+  across the pool to parallelise and survive bans — warm and replay must share the
+  same IP within a session. Re-warm when replays start returning 403/empty. Use it
+  whenever a plain fetch returns a JS shell or gets soft-blocked at volume — not
+  only for sites with a named anti-bot.
 
 **Option 2 — we run it (managed).**
 - Only for **dedicated modules** in V1 (a generic site → use Option 1).
