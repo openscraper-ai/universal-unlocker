@@ -9,7 +9,7 @@
       "name": "openscraper",
       "source": ".",
       "description": "Scrape any website from Claude Code via the OpenScraper MCP — probe a site, price it, sample it, then get runnable code or run it managed. Billed to your own sk_live_ key.",
-      "version": "0.1.1"
+      "version": "0.1.2"
     }
   ]
 }

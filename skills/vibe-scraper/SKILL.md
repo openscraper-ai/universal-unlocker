@@ -106,6 +106,12 @@ shape:
   same IP within a session. Re-warm when replays start returning 403/empty. Use it
   whenever a plain fetch returns a JS shell or gets soft-blocked at volume — not
   only for sites with a named anti-bot.
+  - **If `warm_session` fails** (returns `status: "failed"`, or errors): retry once,
+    then **fall back to the OpenScraper unlocker** — route every fetch per-request
+    through `unlocker_matrix` (managed `run_scrape`, or `generate_client_code` with
+    `module="unlocker_matrix"`). It costs more per page but is robust and needs no
+    proxy from the user. Never drop to a direct scraper or give up — the tool's
+    `fallback` field says exactly this.
 
 **Option 2 — we run it (managed).**
 - Only for **dedicated modules** in V1 (a generic site → use Option 1).

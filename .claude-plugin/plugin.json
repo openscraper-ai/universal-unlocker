@@ -1,7 +1,7 @@
 {
   "name": "openscraper",
   "description": "Guided web scraping over the OpenScraper MCP: probe a site, price it, sample it, then get runnable code or run it managed — all billed to your own sk_live_ key. Bundles the vibe-scraper skill and configures the hosted MCP server.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "OpenScraper",
     "url": "https://openscraper.ai"
