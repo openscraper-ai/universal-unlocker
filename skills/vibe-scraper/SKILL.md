@@ -119,7 +119,7 @@ shape:
   then call **`run_scrape(module, params)`**. It uses OUR proxies — the user
   provides nothing.
 - Poll **`get_run(task_id)`** until `status` is `done`/`error`/`stopped`, report
-  progress, then return results (or `export_results` for large sets).
+  progress (it only shows a 5-row preview), then call **`export_results`**.
 
 ## Code conventions (for generated local code)
 
@@ -156,10 +156,13 @@ server-side campaign engine — split and retry yourself.
   retry just that shard. The user is **only billed for delivered rows** — never
   for what failed. If a whole module is broken (site changed), tell the user
   we'll fix it and they resume, paying only the remainder.
-- **Always deliver locally.** After a managed run finishes, `get_run` /
-  `export_results` and **write the rows to a local file** (`./<module>_<ts>.csv`
-  + `.json`). Managed results also live in our app but are **purged after 15
-  days** — tell the user to keep the local copy.
+- **Deliver through the download link.** After a managed run finishes, call
+  `export_results` (`format="xlsx"` by default, or `"csv"`): it returns a link to
+  ALL rows, valid 24 h, no login. Give it to the user. Never pull the rows
+  through the conversation (a listing is ~1k tokens). For a local file or a
+  database, `curl` the CSV link to `./<module>_<ts>.csv` and import it from
+  there. Managed results are **purged after 15 days** — tell the user to
+  download them.
 
 ## Rules
 - **Always `probe_site` first.** Never quote or launch before probing.
